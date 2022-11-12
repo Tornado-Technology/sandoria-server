@@ -1,5 +1,4 @@
-﻿using Program.Package;
-using Program.Utilites;
+﻿using Program.Utilites;
 using System.Net;
 using System.Net.Sockets;
 
@@ -12,22 +11,19 @@ namespace Program
         private IPEndPoint _ipPoint;
         private TcpListener _listener;
         private List<Client> _clients = new List<Client>();
-        private HandlerLoader _packageLoader = new HandlerLoader();
 
         public Server(string ip, int port)
         {
             _ip = ip;
             _port = port;
             _ipPoint = new IPEndPoint(IPAddress.Any, _port);
+            _listener = new TcpListener(_ipPoint);
         }
 
         public void Start()
         {
             Logger.Info($"Server starting...");
-  
-            _packageLoader.Load();
-
-            _listener = new TcpListener(_ipPoint);
+            
             _listener.Start();
 
             Logger.Info($"Server listening {_ip}:{_port}.");
@@ -41,7 +37,7 @@ namespace Program
         private async void Accept(IAsyncResult result)
         {
             Client client = RegisterClient(_listener.EndAcceptTcpClient(result));
-            await client.BufferRead(_packageLoader);
+            await client.BufferRead();
         }
 
         private Client RegisterClient(TcpClient TCPClient)
